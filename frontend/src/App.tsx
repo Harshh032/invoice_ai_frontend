@@ -7,6 +7,8 @@ import logo from "C:/Users/Vinayak/Pictures/Screenshots/Screenshot (50).png";
 import InvoiceValidationTable from './InvoiceValidationTable';
 import UserProfile from './UserProfile';
 
+const BASE_API_URL = 'https://dcm8mspr-8000.inc1.devtunnels.ms';
+
 function App() {
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -94,11 +96,7 @@ function App() {
     if (activeTab === 'Validation Queue' || activeTab === 'Dashboard') {
       setValidationLoading(true);
       setValidationError(null);
-      fetch('http://127.0.0.1:8000/api/v1/invoices/')
-        .then((res) => {
-          if (!res.ok) throw new Error('Failed to fetch invoices');
-          return res.json();
-        })
+      fetchJson(`${BASE_API_URL}/api/v1/invoices`)
         .then((data) => {
           setValidationInvoices(data);
         })
@@ -112,11 +110,7 @@ function App() {
   useEffect(() => {
     setInvoiceCountLoading(true);
     setInvoiceCountError(null);
-    fetch('http://127.0.0.1:8000/api/v1/invoices/count')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch invoice count');
-        return res.json();
-      })
+    fetchJson(`${BASE_API_URL}/api/v1/invoices/count`)
       .then((data) => {
         setInvoiceCount(data.count);
       })
@@ -129,31 +123,19 @@ function App() {
 
   useEffect(() => {
     setApprovedCountLoading(true);
-    fetch('http://127.0.0.1:8000/api/v1/invoices/count/approved')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch approved count');
-        return res.json();
-      })
+    fetchJson(`${BASE_API_URL}/api/v1/invoices/count/approved`)
       .then((data) => setApprovedCount(data.count))
       .catch(() => setApprovedCount(0))
       .finally(() => setApprovedCountLoading(false));
 
     setPendingCountLoading(true);
-    fetch('http://127.0.0.1:8000/api/v1/invoices/count/pending')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch pending count');
-        return res.json();
-      })
+    fetchJson(`${BASE_API_URL}/api/v1/invoices/count/pending`)
       .then((data) => setPendingCount(data.count))
       .catch(() => setPendingCount(0))
       .finally(() => setPendingCountLoading(false));
 
     setErrorCountLoading(true);
-    fetch('http://127.0.0.1:8000/api/v1/invoices/count/error')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch error count');
-        return res.json();
-      })
+    fetchJson(`${BASE_API_URL}/api/v1/invoices/count/error`)
       .then((data) => setErrorCount(data.count))
       .catch(() => setErrorCount(0))
       .finally(() => setErrorCountLoading(false));
@@ -203,7 +185,7 @@ function App() {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/v1/invoices/upload', {
+      const response = await fetch(`${BASE_API_URL}/api/v1/invoices/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -442,6 +424,18 @@ function App() {
       </div>
     </div>
   );
+
+  // Defensive fetch utility
+  const fetchJson = async (url: string, options?: RequestInit) => {
+    const res = await fetch(url, options);
+    const contentType = res.headers.get('content-type');
+    if (!res.ok) throw new Error('Failed to fetch: ' + url);
+    if (contentType && contentType.includes('application/json')) {
+      return res.json();
+    } else {
+      throw new Error('Server did not return JSON. Check API URL and backend status.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-50">
