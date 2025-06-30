@@ -7,7 +7,7 @@ import logo from "C:/Users/Vinayak/Pictures/Screenshots/Screenshot (50).png";
 import InvoiceValidationTable from './InvoiceValidationTable';
 import UserProfile from './UserProfile';
 
-const BASE_API_URL = 'https://dcm8mspr-8000.inc1.devtunnels.ms';
+const BASE_API_URL = 'http://127.0.0.1:8000';
 
 function App() {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -471,7 +471,7 @@ function App() {
             <div className="flex items-center space-x-4">
               <button
                 className="bg-black hover:bg-gray-800 text-white font-semibold px-4 py-2 rounded-xl transition-colors shadow"
-                onClick={() => window.open('https://your-erp-url.com', '_blank', 'noopener,noreferrer')}
+                onClick={() => window.open('https://www.zoho.com/creator/industries/custom-erp-software.html', '_blank', 'noopener,noreferrer')}
                 type="button"
               >
                 Go to ERP
@@ -671,11 +671,11 @@ function App() {
                             className="w-full bg-white border border-gray-300 rounded px-2 py-2 font-semibold text-base text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-0"
                             type="number"
                             min="0"
-                            value={item.value}
+                            value={item.price !== undefined ? item.price : item.value || ''}
                             placeholder="Value ($)"
                             onChange={e => {
                               const newItems = (selectedInvoice.items ? [...selectedInvoice.items] : []);
-                              newItems[idx] = { ...item, value: e.target.value };
+                              newItems[idx] = { ...item, value: e.target.value, price: e.target.value };
                               setSelectedInvoice({ ...selectedInvoice, items: newItems });
                             }}
                           />
